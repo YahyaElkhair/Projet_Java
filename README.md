@@ -1,2 +1,2 @@
 # Projet_Java
-Application pour detecter les fichier doublon en java
+Application pour detecter les fichier doublon dans un dossier en java
