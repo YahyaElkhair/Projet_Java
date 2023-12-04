@@ -7,9 +7,19 @@ import java.util.*;
 
 public class MainApplication {
     public static void main(String[] args) {
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("                           **********************************************************");   
+    	System.out.println("                           *          APPLICATEUR POUR DETECTER LES FICHIERS        *");
+     	System.out.println("                           *                 DOUBLE DANS UN DOSSIER                 *");
+     	System.out.println("                           **********************************************************");   
+        System.out.println();
+        System.out.println();
         // Initialisation du scanner pour la saisie utilisateur
         Scanner sc = new Scanner(System.in);
-        System.out.print("Enter le chemin du dossier : ");
+        System.out.print("Enter le chemin du dossier A chercher: ");
         
         // Lecture du chemin du dossier fourni par l'utilisateur
         String cheminDossier = sc.nextLine();
@@ -24,8 +34,10 @@ public class MainApplication {
         if (!fichiersEnDouble) {
             System.out.println("Aucun fichier en double.");
         } else {
-            System.out.println("Entrez 1 pour supprimer un fichier.");
-            System.out.println("Entrez 0 pour quitter.");
+            System.out.println();
+            System.out.println("Entrez 1 pour supprimer un fichier !!");
+            System.out.println("Entrez 0 pour quitter !!");
+              System.out.println();
             System.out.print("Choix : ");
             int x = sc.nextInt();
             sc.nextLine();
@@ -37,6 +49,7 @@ public class MainApplication {
                     sauvegarderEtSupprimerFichierDoublant(nomFichier);
                 
                     // Réaffichage après suppression
+                    System.out.println("------------------- Mise a jour le dossier -------------------");
                     afficherFichiersDoubles(nomFichier);
                     break;
                 default:
@@ -51,6 +64,7 @@ public class MainApplication {
 
         // Vérification de l'existence et du type du dossier
         if (!dossier.exists() || !dossier.isDirectory()) {
+              System.out.println();
             System.err.println("Le dossier spécifié n'existe pas ou n'est pas un dossier valide.");
         }
 
@@ -92,25 +106,35 @@ public class MainApplication {
     // Fonction pour afficher les fichiers en double
     private static boolean afficherFichiersDoubles(Map<String, List<String>> nomFichier) {
         boolean fichiersEnDouble = false;
+
+        System.out.println();
         // Affichage des fichiers en double
+        System.out.println();
         System.out.println("Fichiers en double :");
+        System.out.println();
         for (Map.Entry<String, List<String>> entry : nomFichier.entrySet()) {
             List<String> fichiers = entry.getValue();
             if (fichiers.size() > 1) {
                 fichiersEnDouble = true;
+                  System.out.println();
                 System.out.println("Nom du fichier : " + entry.getKey());
                 for (String chemin : fichiers) {
+                      System.out.println();
                     System.out.println("   Chemin du fichier : " + chemin);
                 }
+                 System.out.println();
                 System.out.println("------------------------------------");
             }
         }
         return fichiersEnDouble;
     }
-
+    
     public static void sauvegarderEtSupprimerFichierDoublant(Map<String, List<String>> fichiersParNom) {
         Scanner sc = new Scanner(System.in);
         while (true) {
+            System.out.println();
+            System.out.println("------------------------------------");
+            System.out.println();
             System.out.print("Entrez le nom du fichier à sauvegarder et supprimer : ");
             String fichierASauvegarder = sc.nextLine();
 
@@ -118,26 +142,32 @@ public class MainApplication {
                 List<String> cheminsFichiers = fichiersParNom.get(fichierASauvegarder);
 
                 if (cheminsFichiers.size() > 1) {
+                    System.out.println();                  
                     System.out.println("Les chemins des fichiers doublants pour " + fichierASauvegarder + " sont :");
+                    System.out.println();
                     for (int i = 0; i < cheminsFichiers.size(); i++) {
                         System.out.println((i + 1) + ". " + cheminsFichiers.get(i));
-                    }
-
-                    System.out.println("Entrez le numéro du fichier que vous voulez sauvegarder et supprimer (1 - " + cheminsFichiers.size() + "): ");
+                    } System.out.println();
+                    System.out.println("------------------------------------");
+                    System.out.println();
+                    System.out.println("Entrez le numéro du fichier que vous voulez supprimer (1 - " + cheminsFichiers.size() + "): ");
+                    
                     int numeroFichierASauvegarder = sc.nextInt();
                     sc.nextLine();
 
                     String cheminFichierASauvegarder = cheminsFichiers.get(numeroFichierASauvegarder - 1);
                     File fichierASupprimer = new File(cheminFichierASauvegarder);
-
+                    System.out.println();
                     System.out.println("Entrer 2 pour arrchiver le fichier supprimer dans un autre dossier.");
                     System.out.println("Entrer 0 pour quitter.");
+                    System.out.println();
                     System.out.print("Votre choix : ");
 
                     int x = sc.nextInt();
                     sc.nextLine();
                     switch (x) {
                         case 2:
+                         System.out.println("------------------------------------");
                             System.out.print("Entrez le chemin du dossier de sauvegarde : ");
                             String cheminDossierSauvegarde = sc.nextLine();
                             sauvegarderFichiers(Collections.singletonList(cheminFichierASauvegarder), cheminDossierSauvegarde);
@@ -150,16 +180,20 @@ public class MainApplication {
                     }
 
                     if (fichierASupprimer.exists() && fichierASupprimer.delete()) {
-                        System.out.println("Le fichier a été supprimé avec succès.");
+                         System.out.println();
+                        System.out.println("Le fichier a été supprimé avec succès !!");
                         cheminsFichiers.remove(numeroFichierASauvegarder - 1);
                         break;
                     } else {
+                        System.out.println();
                         System.out.println("Erreur lors de la suppression du fichier.");
                     }
                 } else {
+                      System.out.println();
                     System.out.println("Le fichier n'a pas de doublons.");
                 }
             } else {
+                  System.out.println();
                 System.out.println("Ce fichier n'existe pas en doublon dans le dossier.");
             }
         }
@@ -178,12 +212,15 @@ public class MainApplication {
 
                 try {
                     Files.copy(fichierASupprimer.toPath(), fichierSauvegarde.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("Fichier sauvegardé : " + fichierSauvegarde.getAbsolutePath());
+                      System.out.println();
+                    System.out.println("Fichier sauvegardé avec succes : " + fichierSauvegarde.getAbsolutePath());
                 } catch (IOException e) {
+                      System.out.println();
                     System.err.println("Erreur lors de la sauvegarde du fichier : " + chemin);
                     e.printStackTrace();
                 }
             } else {
+                  System.out.println();
                 System.out.println("Le fichier à sauvegarder n'existe pas : " + chemin);
             }
         }
