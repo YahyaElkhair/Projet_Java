@@ -1,5 +1,9 @@
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
+
 
 public class MainApplication {
     public static void main(String[] args) {
@@ -20,8 +24,8 @@ public class MainApplication {
         if (!fichiersEnDouble) {
             System.out.println("Aucun fichier en double.");
         } else {
-            System.out.println("Entrez 1 pour supprimer un fichier : ");
-            System.out.println("Entrez 0 pour quitter : ");
+            System.out.println("Entrez 1 pour supprimer un fichier.");
+            System.out.println("Entrez 0 pour quitter.");
             System.out.print("Choix : ");
             int x = sc.nextInt();
             sc.nextLine();
@@ -29,11 +33,8 @@ public class MainApplication {
                 case 0:
                     break;
                 case 1:
-                    System.out.print("Entrez le nom du fichier à supprimer : ");
-                    String fichierASupprimer = sc.nextLine();
-                
                     // Appel de la fonction pour supprimer le fichier
-                    supprimerFichierDoublant(fichierASupprimer, nomFichier);
+                    sauvegarderEtSupprimerFichierDoublant(nomFichier);
                 
                     // Réaffichage après suppression
                     afficherFichiersDoubles(nomFichier);
@@ -43,8 +44,7 @@ public class MainApplication {
             }
         }
     }
-    
-    
+
     public static Map<String, List<String>> FichiersDoubles(String cheminDossier) {
         // Création d'un objet File pour représenter le dossier
         File dossier = new File(cheminDossier);
@@ -108,43 +108,84 @@ public class MainApplication {
         return fichiersEnDouble;
     }
 
-    public static void supprimerFichierDoublant(String nomFichier, Map<String, List<String>> fichiersParNom) {
-        // Vérification si le fichier existe en doublon
-        if (fichiersParNom.containsKey(nomFichier)) {
-            List<String> cheminsFichiers = fichiersParNom.get(nomFichier);
-    
-            // Si le fichier a des doublons
-            if (cheminsFichiers.size() > 1) {
-                Scanner sc = new Scanner(System.in);
-                System.out.println("Les chemins des fichiers doublants pour " + nomFichier + " sont :");
-                for (String chemin : cheminsFichiers) {
-                    System.out.println(chemin);
-                }
-    
-                System.out.println("Entrez le numéro du fichier que vous voulez supprimer (1 - " + cheminsFichiers.size() + "): ");
-                int numeroFichierASupprimer = sc.nextInt();
-    
-                // Suppression du fichier choisi par l'utilisateur
-                String cheminFichierASupprimer = cheminsFichiers.get(numeroFichierASupprimer - 1);
-                File fichierASupprimer = new File(cheminFichierASupprimer);
-    
-                // Vérification et suppression du fichier
-                if (fichierASupprimer.exists()) {
-                    if (fichierASupprimer.delete()) {
+    public static void sauvegarderEtSupprimerFichierDoublant(Map<String, List<String>> fichiersParNom) {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.print("Entrez le nom du fichier à sauvegarder et supprimer : ");
+            String fichierASauvegarder = sc.nextLine();
+
+            if (fichiersParNom.containsKey(fichierASauvegarder)) {
+                List<String> cheminsFichiers = fichiersParNom.get(fichierASauvegarder);
+
+                if (cheminsFichiers.size() > 1) {
+                    System.out.println("Les chemins des fichiers doublants pour " + fichierASauvegarder + " sont :");
+                    for (int i = 0; i < cheminsFichiers.size(); i++) {
+                        System.out.println((i + 1) + ". " + cheminsFichiers.get(i));
+                    }
+
+                    System.out.println("Entrez le numéro du fichier que vous voulez sauvegarder et supprimer (1 - " + cheminsFichiers.size() + "): ");
+                    int numeroFichierASauvegarder = sc.nextInt();
+                    sc.nextLine();
+
+                    String cheminFichierASauvegarder = cheminsFichiers.get(numeroFichierASauvegarder - 1);
+                    File fichierASupprimer = new File(cheminFichierASauvegarder);
+
+                    System.out.println("Entrer 2 pour arrchiver le fichier supprimer dans un autre dossier.");
+                    System.out.println("Entrer 0 pour quitter.");
+                    System.out.print("Votre choix : ");
+
+                    int x = sc.nextInt();
+                    sc.nextLine();
+                    switch (x) {
+                        case 2:
+                            System.out.print("Entrez le chemin du dossier de sauvegarde : ");
+                            String cheminDossierSauvegarde = sc.nextLine();
+                            sauvegarderFichiers(Collections.singletonList(cheminFichierASauvegarder), cheminDossierSauvegarde);
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            System.out.println("Choix invalid");
+                            break;
+                    }
+
+                    if (fichierASupprimer.exists() && fichierASupprimer.delete()) {
                         System.out.println("Le fichier a été supprimé avec succès.");
-                        // Mettre à jour la liste des fichiers dans la Map
-                        cheminsFichiers.remove(numeroFichierASupprimer - 1);
+                        cheminsFichiers.remove(numeroFichierASauvegarder - 1);
+                        break;
                     } else {
                         System.out.println("Erreur lors de la suppression du fichier.");
                     }
                 } else {
-                    System.out.println("Le fichier n'existe pas.");
+                    System.out.println("Le fichier n'a pas de doublons.");
                 }
             } else {
-                System.out.println("Le fichier n'a pas de doublons.");
+                System.out.println("Ce fichier n'existe pas en doublon dans le dossier.");
             }
-        } else {
-            System.out.println("Ce fichier n'existe pas en doublon dans le dossier.");
+        }
+    }
+
+    public static void sauvegarderFichiers(List<String> cheminsFichiersASupprimer, String dossierSauvegarde) {
+        File dossierBackup = new File(dossierSauvegarde);
+        if (!dossierBackup.exists()) {
+            dossierBackup.mkdirs();
+        }
+
+        for (String chemin : cheminsFichiersASupprimer) {
+            File fichierASupprimer = new File(chemin);
+            if (fichierASupprimer.exists()) {
+                File fichierSauvegarde = new File(dossierBackup, fichierASupprimer.getName());
+
+                try {
+                    Files.copy(fichierASupprimer.toPath(), fichierSauvegarde.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("Fichier sauvegardé : " + fichierSauvegarde.getAbsolutePath());
+                } catch (IOException e) {
+                    System.err.println("Erreur lors de la sauvegarde du fichier : " + chemin);
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Le fichier à sauvegarder n'existe pas : " + chemin);
+            }
         }
     }
 }
